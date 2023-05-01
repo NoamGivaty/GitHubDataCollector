@@ -12,6 +12,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +39,7 @@ public class GitHubService {
 
     //----main-method------------
     public String getMultiplyUsersInfo(List<String> users, List<String> keywords) throws IOException, InterruptedException {
+
         JSONArray jsonArray = new JSONArray();
         List<Thread> threads = new ArrayList<>();
 
@@ -133,10 +135,10 @@ public class GitHubService {
         objectNode.put("commits", commits.get());
         objectNode.put("stars", stars.get());
 
-
-        cloneRepositories(repositoryUrls,username); //Cloning repositories
-        objectNode.setAll(getFilesData(keywords,username));
-        deleteRepositoriesFolder(username); //Deleting cloned repositories
+        String path = username + "Repositories" + generateRandomString();
+        cloneRepositories(repositoryUrls,username, path); //Cloning repositories
+        objectNode.setAll(getFilesData(keywords, path));
+        deleteRepositoriesFolder(path); //Deleting cloned repositories
 
         return objectNode;
     } //data that fetches from each repository
@@ -185,9 +187,8 @@ public class GitHubService {
         return objectNode;
     } //data on programming language
     //----clonde-count-delete-(from files)------------
-    public static void cloneRepositories(List<String> repositoryUrls, String username) throws IOException, InterruptedException {
-        String repositoriesFolderPath = username + "Repositories";
-        File repositoriesFolder = new File(repositoriesFolderPath);
+    public static void cloneRepositories(List<String> repositoryUrls, String username, String path) throws IOException, InterruptedException {
+        File repositoriesFolder = new File(path);
         repositoriesFolder.mkdir();
         List<Thread> threads = new ArrayList<>();
 
@@ -223,7 +224,7 @@ public class GitHubService {
             }
         }
     }
-    public static ObjectNode getFilesData(List<String> keys, String username) throws IOException {
+    public static ObjectNode getFilesData(List<String> keys, String path) throws IOException {
         List<String> importantKeywords = importantKeywords();
         List<String> keywords = new ArrayList<>();
         keywords.addAll(importantKeywords);
@@ -238,7 +239,7 @@ public class GitHubService {
 
         System.out.println("Start reading lines");
 
-        Path repositoriesFolder = Path.of(REPOSITORIES_FOLDER_PATH + username + "Repositories");
+        Path repositoriesFolder = Path.of(path);
         Files.walk(repositoriesFolder)
                 .filter(Files::isRegularFile)
                 .filter(x-> !(x.getFileName().toAbsolutePath().toString().contains(".git")))
@@ -313,8 +314,8 @@ public class GitHubService {
 
         return keywords;
     }
-    public static void deleteRepositoriesFolder(String username){
-        File repositoriesFolder = new File(username + "Repositories");
+    public static void deleteRepositoriesFolder(String path){
+        File repositoriesFolder = new File(path);
         try {
             FileUtils.deleteDirectory(repositoriesFolder);
         } catch (IOException e) {
@@ -366,5 +367,18 @@ public class GitHubService {
         Matcher matcher = pattern.matcher(response.body().string());
         matcher.find();
         return matcher.group(1);
+    }
+
+    public static String generateRandomString() {
+        final int LENGTH = 5;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(LENGTH);
+
+        for (int i = 0; i < LENGTH; i++) {
+            sb.append(characters.charAt(random.nextInt(characters.length())));
+        }
+
+        return sb.toString();
     }
 }
