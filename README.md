@@ -10,9 +10,15 @@ To run the application, set up the project with an IDE and run it. Access the ap
 
 The GitHub Data Collector uses the following technologies:
 - Java
+- Spring Boot
 - Regex
 - Web Scraping
 - Docker
+
+
+## Docker Image
+
+To run the application using Docker, build the Dockerfile and run the image.
 
 ## Data Collected
 
@@ -21,18 +27,16 @@ The GitHub Data Collector collects the following data for each user:
 - User's URL
 - Number of Public Repositories
 - Number of Followers
-- Number of People the User is Following
+- Number of Following
+- Number of Forks
+- Number of Commits
+- Number of Stars
+- Number of Code Lines
+- Number of Keywords Apears
+- Number of Tests
 - Number of Java Repositories
 - Number of Python Repositories
 - Number of Node.js Repositories
 - Number of Angular Repositories
 - Number of React Repositories
 - Number of .NET Repositories
-- Number of Forks
-- Number of Commits
-- Number of Stars
-
-## Docker Image
-
-To run the application using Docker, build the Dockerfile and run the image.
-
