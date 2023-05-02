@@ -18,11 +18,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONObject;
 
-
 @Service
 public class GitHubService {
     private static String[] EXTENSIONS = new String[]{".java", ".py", ".js", ".php", ".rb", ".cpp", ".h", ".c", ".cs"}; // Define the file extensions to include
-    private static String REPOSITORIES_FOLDER_PATH = "./";
     public static final Pattern REPOSITORIES_PATTERN = Pattern.compile("codeRepository[^\\s]+[^\\S][^\\n][^\\S]+([^<]+)");
     public static final Pattern NUM_OF_REPOSITORIES_PATTERN = Pattern.compile("Repositories[^<]+<span title=\\\"([^\\\"]+)");
     public static final Pattern NAME_PATTERN = Pattern.compile("itemprop=\\\"name[^\\s]+[^\\S][^\\n][^\\S]+([^\\n]+)");
@@ -31,21 +29,23 @@ public class GitHubService {
     public static final Pattern COMMITS_PATTERN = Pattern.compile("<span class=\\\"d-none d-sm-inline\\\">[^\\S]+<strong>([^<]+)");
     public static final Pattern STARS_PATTERN = Pattern.compile("text-bold[^>]+>([^<]+)[^f]+stars");
     public static final Pattern PROGRAMMING_LANGUAGE_PATTERN = Pattern.compile("programmingLanguage\\\">([^<]+)");
+
     private static OkHttpClient client = new OkHttpClient.Builder()
             .callTimeout(Duration.ofSeconds(60))
             .readTimeout(Duration.ofSeconds(60))
             .connectTimeout(Duration.ofSeconds(60))
             .build();
 
+
     //----main-method------------
     public String getMultiplyUsersInfo(List<String> users, List<String> keywords) throws IOException, InterruptedException {
 
         JSONArray jsonArray = new JSONArray();
-        List<Thread> threads = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         for (String user : users) {
-            Thread thread = new Thread(() -> {
-                JSONObject jsonObject = null;
+            executorService.execute(new Thread(()->{
+                JSONObject jsonObject;
                 try {
                     jsonObject = new JSONObject(getUserInfo(user, keywords));
                 } catch (IOException e) {
@@ -54,19 +54,11 @@ public class GitHubService {
                     throw new RuntimeException(e);
                 }
                 jsonArray.put(jsonObject);
-            });
-            threads.add(thread);
-            thread.start();
-        }
 
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            }));
         }
-
+        executorService.shutdown();
+        executorService.awaitTermination(1000000,TimeUnit.HOURS);
 
         return jsonArray.toString();
     }
@@ -86,7 +78,11 @@ public class GitHubService {
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode objectNode = factory.objectNode();
 
-        objectNode.put("name", getRegexGroup(NAME_PATTERN,username,1,1));
+        String name = getRegexGroup(NAME_PATTERN,username,1,1);
+        if (name.equals("</span>"))
+            name = "N/A";
+        objectNode.put("name",name);
+        objectNode.put("username",username);
         objectNode.put("url","https://github.com/" + username);
         objectNode.put("public_repos",getRegexGroup(NUM_OF_REPOSITORIES_PATTERN,username,1,1));
         objectNode.put("followers",getRegexGroup(FOLLOW_PATTERN,username,1,1));
@@ -98,6 +94,7 @@ public class GitHubService {
     public static ObjectNode repositoriesData(String username, List<String> keywords) throws IOException, InterruptedException {
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode objectNode = factory.objectNode();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         List<String> repositoryUrls = scrapingUrls(username); //Creating List (String) of Repositories URL
 
@@ -120,16 +117,11 @@ public class GitHubService {
                 }
             });
             threads.add(thread);
-            thread.start();
+            executorService.execute(thread);
         }
 
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        executorService.shutdown();
+        executorService.awaitTermination(10000,TimeUnit.HOURS);
 
         objectNode.put("forks", forks.get());
         objectNode.put("commits", commits.get());
@@ -190,10 +182,11 @@ public class GitHubService {
     public static void cloneRepositories(List<String> repositoryUrls, String username, String path) throws IOException, InterruptedException {
         File repositoriesFolder = new File(path);
         repositoriesFolder.mkdir();
-        List<Thread> threads = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+
 
         for (String repositoryUrl : repositoryUrls) {
-            Thread thread = new Thread(() -> {
+            executorService.execute(new Thread(() -> {
                 String[] command = {"git", "clone", repositoryUrl};
                 ProcessBuilder processBuilder = new ProcessBuilder(command);
                 processBuilder.directory(repositoriesFolder);
@@ -211,18 +204,12 @@ public class GitHubService {
                 } else {
                     System.err.println("Failed to clone repository: " + repositoryUrl);
                 }
-            });
-            threads.add(thread);
-            thread.start();
+            }));
         }
 
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        executorService.shutdown();
+
+        executorService.awaitTermination(1000,TimeUnit.HOURS);
     }
     public static ObjectNode getFilesData(List<String> keys, String path) throws IOException {
         List<String> importantKeywords = importantKeywords();
@@ -297,7 +284,10 @@ public class GitHubService {
 
         objectNode.put("code_lines",totalLinesOfCode.toString());
         objectNode.put("tests",count);
-        objectNode.put("keywords",words.toString());
+        if(words.toString().contains("{="))
+            objectNode.put("keywords","-");
+        else
+            objectNode.put("keywords",words.toString());
 
         return objectNode;
     }
@@ -368,7 +358,6 @@ public class GitHubService {
         matcher.find();
         return matcher.group(1);
     }
-
     public static String generateRandomString() {
         final int LENGTH = 5;
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

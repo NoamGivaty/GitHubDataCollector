@@ -25,81 +25,16 @@ import org.supercsv.prefs.CsvPreference;
 @Service
 public class JsonToExcelConverter {
 
-
-    public void writeJsonToExcel(String jsonData) throws IOException, JSONException {
-
-        // Parse JSON data
-        JSONArray jsonArray = new JSONArray(jsonData);
-
-        Path tempFile = Files.createTempFile(UUID.randomUUID().toString(), ".csv");
-        String tempFilePath = tempFile.toAbsolutePath().toString();
-        String[] headers = { "Name", "Url", "Public Repos", "Followers", "Following", "Java Repositories",
-                "Python Repositories", "Node.js Repositories", "Angular Repositories",
-                "React Repositories", ".NET Repositories", "Forks", "Commits", "Stars",
-                "Code Lines", "Tests", "Keywords" };
-        try (ICsvBeanWriter csvWriter = new CsvBeanWriter(new FileWriter(tempFilePath, StandardCharsets.UTF_8, true), CsvPreference.STANDARD_PREFERENCE)) {
-            String[] headerColumns = headers;
-            csvWriter.writeHeader(headerColumns);
-            String[] columnsMapping = {"name", "url", "public_repos","followers","following","java_repositories","python_repositories","node.js_repositories",
-                    "angular_repositories","react_repositories",".net_repositories", "forks","commits","stars","code_lines","tests","keywords"};
-            for (int i = 0 ; i < jsonArray.length(); i++) {
-                csvWriter.write(jsonArray.getJSONObject(i), columnsMapping);
-            }
-        }
-
-//        // Create Excel workbook and sheet
-//        Workbook workbook = new XSSFWorkbook();
-//        Sheet sheet = workbook.createSheet("Users Data");
-//
-//        // Write header row
-//        Row headerRow = sheet.createRow(0);
-//        for (int i = 0; i < headers.length; i++) {
-//            Cell cell = headerRow.createCell(i);
-//            cell.setCellValue(headers[i]);
-//        }
-//
-//        // Write data rows
-//        for (int i = 0; i < jsonArray.length(); i++) {
-//            JSONObject jsonObject = jsonArray.getJSONObject(i);
-//            Row dataRow = sheet.createRow(i + 1);
-//
-//            dataRow.createCell(0).setCellValue(jsonObject.getString("name"));
-//            dataRow.createCell(1).setCellValue(jsonObject.getString("url"));
-//            dataRow.createCell(2).setCellValue(jsonObject.getString("public_repos"));
-//            dataRow.createCell(3).setCellValue(jsonObject.getString("followers"));
-//            dataRow.createCell(4).setCellValue(jsonObject.getString("following"));
-//            dataRow.createCell(5).setCellValue(jsonObject.getInt("java_repositories"));
-//            dataRow.createCell(6).setCellValue(jsonObject.getInt("python_repositories"));
-//            dataRow.createCell(7).setCellValue(jsonObject.getInt("node.js_repositories"));
-//            dataRow.createCell(8).setCellValue(jsonObject.getInt("angular_repositories"));
-//            dataRow.createCell(9).setCellValue(jsonObject.getInt("react_repositories"));
-//            dataRow.createCell(10).setCellValue(jsonObject.getInt(".net_repositories"));
-//            dataRow.createCell(11).setCellValue(jsonObject.getInt("forks"));
-//            dataRow.createCell(12).setCellValue(jsonObject.getInt("commits"));
-//            dataRow.createCell(13).setCellValue(jsonObject.getInt("stars"));
-//            dataRow.createCell(14).setCellValue(jsonObject.getString("code_lines"));
-//            dataRow.createCell(15).setCellValue(jsonObject.getInt("tests"));
-//            dataRow.createCell(16).setCellValue(jsonObject.getString("keywords"));
-//        }
-//
-//        // Write Excel file
-//        FileOutputStream outputStream = new FileOutputStream("github_user.xlsx");
-//        workbook.write(outputStream);
-//        workbook.close();
-//        outputStream.close();
-        System.out.println("Excel file written successfully.");
-    }
-
     public String writeJsonToCsv(String jsonData) throws IOException, JSONException {
         // Parse JSON data
         JSONArray jsonArray = new JSONArray(jsonData);
 
         // Define headers for CSV
-        String[] headers = { "Name", "Url", "Public Repos", "Followers", "Following", "Java Repositories",
+        String[] headers = { "Name", "Username", "Url", "Public Repos", "Followers", "Following", "Java Repositories",
                 "Python Repositories", "Node.js Repositories", "Angular Repositories",
                 "React Repositories", ".NET Repositories", "Forks", "Commits", "Stars",
                 "Code Lines", "Tests", "Keywords" };
-        String[] columnsMapping = {"name", "url", "publicRepos","followers","following","javaRepositories","pythonRepositories","nodeJsRepositories",
+        String[] columnsMapping = {"name", "username", "url", "publicRepos","followers","following","javaRepositories","pythonRepositories","nodeJsRepositories",
                 "angularRepositories","reactRepositories","netRepositories", "forks","commits","stars","codeLines","tests","keywords"};
 
         // Write data to CSV file
@@ -112,6 +47,7 @@ public class JsonToExcelConverter {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 GithubData data = new GithubData();
                 data.setName(obj.getString("name"));
+                data.setUsername(obj.getString("username"));
                 data.setUrl(obj.getString("url"));
                 data.setPublicRepos(obj.getString("public_repos"));
                 data.setFollowers(obj.getString("followers"));
@@ -132,9 +68,11 @@ public class JsonToExcelConverter {
             }
         }
         System.out.println("Excel file written successfully.");
-        String res =  baos.toString(StandardCharsets.UTF_8).replaceAll("\r\n","\n");
+        String res = baos.toString(StandardCharsets.UTF_8)
+                .replaceAll("\r\n          ","")
+                .replaceAll("\"\r\n","\"\n");
+
         return res;
     }
-
 }
 

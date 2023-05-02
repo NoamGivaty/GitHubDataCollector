@@ -2,6 +2,7 @@ package com.GitHubDataCollector.service;
 
 public class GithubData {
     private String name;
+    private String username;
     private String url;
     private String publicRepos;
     private String followers;
@@ -25,6 +26,14 @@ public class GithubData {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getUrl() {
