@@ -20,7 +20,7 @@ import org.json.JSONObject;
 
 @Service
 public class GitHubService {
-    private static String[] EXTENSIONS = new String[]{".java", ".py", ".js", ".php", ".rb", ".cpp", ".h", ".c", ".cs"}; // Define the file extensions to include
+    private static String[] EXTENSIONS = new String[]{".java", ".py", ".js", ".php", ".rb", ".cpp", ".h", ".c", ".cs", ".html"}; // Define the file extensions to include
     public static final Pattern REPOSITORIES_PATTERN = Pattern.compile("codeRepository[^\\s]+[^\\S][^\\n][^\\S]+([^<]+)");
     public static final Pattern NUM_OF_REPOSITORIES_PATTERN = Pattern.compile("Repositories[^<]+<span title=\\\"([^\\\"]+)");
     public static final Pattern NAME_PATTERN = Pattern.compile("itemprop=\\\"name[^\\s]+[^\\S][^\\n][^\\S]+([^\\n]+)");
@@ -73,6 +73,7 @@ public class GitHubService {
 
         return  objectNode.toString();
     } //main method
+
     //----data-collectors------------
     public static ObjectNode rawData (String username) throws IOException {
         JsonNodeFactory factory = JsonNodeFactory.instance;
@@ -97,7 +98,6 @@ public class GitHubService {
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         List<String> repositoryUrls = scrapingUrls(username); //Creating List (String) of Repositories URL
-
         List<Thread> threads = new ArrayList<>();
 
         AtomicInteger forks = new AtomicInteger();
@@ -139,7 +139,10 @@ public class GitHubService {
         ObjectNode objectNode = factory.objectNode();
 
         float numOfRepositoriesPages = Float.parseFloat(getRegexGroup(NUM_OF_REPOSITORIES_PATTERN,username,1,1)) / 30;
-        int java = 0, python = 0, node = 0, angular = 0, react = 0, net = 0;
+        int java = 0, python = 0, node = 0, angular = 0, react = 0,
+                net = 0, ejs = 0, cSharp = 0, js = 0, jupyter = 0,
+                cpp = 0, css = 0, kotlin = 0, c = 0, dart = 0, typeScript = 0,
+                htmlRep = 0, objectiveC = 0;
 
         for(int i=1 ; numOfRepositoriesPages > 0 ; i++, numOfRepositoriesPages--){
             String html = getGitHubHtml(username,i);
@@ -147,8 +150,44 @@ public class GitHubService {
 
             while(matcher.find()){
                 switch (matcher.group(1)){
+                    case "Objective-C":
+                        objectiveC++;
+                        break;
+                    case "Dart":
+                        dart++;
+                        break;
+                    case "TypeScript":
+                        typeScript++;
+                        break;
+                    case "C":
+                        c++;
+                        break;
+                    case "Kotlin":
+                        kotlin++;
+                        break;
+                    case "HTML":
+                        htmlRep++;
+                        break;
                     case "Java":
                         java++;
+                        break;
+                    case "EJS":
+                        ejs++;
+                        break;
+                    case "C#":
+                        cSharp++;
+                        break;
+                    case "JavaScript":
+                        js++;
+                        break;
+                    case "Jupyter Notebook":
+                        jupyter++;
+                        break;
+                    case "C++":
+                        cpp++;
+                        break;
+                    case "CSS":
+                        css++;
                         break;
                     case "Python":
                         python++;
@@ -169,7 +208,19 @@ public class GitHubService {
             }
         }
 
+        objectNode.put("objectiveC_repositories",objectiveC);
+        objectNode.put("kotlin_repositories",kotlin);
+        objectNode.put("dart_repositories",dart);
+        objectNode.put("c_repositories",c);
+        objectNode.put("typeScript_repositories",typeScript);
+        objectNode.put("html_repositories",htmlRep);
         objectNode.put("java_repositories",java);
+        objectNode.put("ejs_repositories",ejs);
+        objectNode.put("cSharp_repositories",cSharp);
+        objectNode.put("javaScript_repositories",js);
+        objectNode.put("jupyter_repositories",jupyter);
+        objectNode.put("cpp_repositories",cpp);
+        objectNode.put("css_repositories",css);
         objectNode.put("python_repositories",python);
         objectNode.put("node.js_repositories",node);
         objectNode.put("angular_repositories",angular);
@@ -178,7 +229,7 @@ public class GitHubService {
 
         return objectNode;
     } //data on programming language
-    //----clonde-count-delete-(from files)------------
+    //----clone-count-delete-(from files)------------
     public static void cloneRepositories(List<String> repositoryUrls, String username, String path) throws IOException, InterruptedException {
         File repositoriesFolder = new File(path);
         repositoriesFolder.mkdir();
@@ -230,41 +281,41 @@ public class GitHubService {
         Files.walk(repositoriesFolder)
                 .filter(Files::isRegularFile)
                 .filter(x-> !(x.getFileName().toAbsolutePath().toString().contains(".git")))
-                .forEach(file -> {
-                    if (!file.toString().contains(".git")) {
-                        try {
-                            List<String> lines = Files.readAllLines(file);
-                            int linesOfCode = lines.size();
-                            String fileName = file.getFileName().toString();
-                            for (String extension : EXTENSIONS) {
-                                if (fileName.endsWith(extension)) {
-                                    totalLinesOfCode.addAndGet(linesOfCode);
-                                }
-                            }
-
-                            Path repositoryPath = repositoriesFolder.relativize(file.getParent());
-                            String repositoryName = repositoryPath.toString();
-
-                            linesOfCodePerRepository.merge(repositoryName, linesOfCode, Integer::sum);
-
-                            for (String keyword : keywords) {
-                                int count = 0;
-                                String regex = Pattern.quote(keyword.toLowerCase());
-                                Pattern pattern = Pattern.compile(regex);
-                                for (String line : lines) {
-                                    Matcher matcher = pattern.matcher(line.toLowerCase());
-                                    while (matcher.find()) {
-                                        count++;
-                                    }
-                                }
-                                keywordCount.merge(keyword, count, Integer::sum);
-                            }
-
-
-                            System.out.println("Read file: " + file);
-                        } catch (IOException e) {
-                            System.err.println("Failed to read file: " + file);
+                .filter(file -> {
+                    String fileName = file.getFileName().toString();
+                    for (String extension : EXTENSIONS) {
+                        if (fileName.endsWith(extension)) {
+                            return true;
                         }
+                    }
+                    return false;
+                })
+                .forEach(file -> {
+                    try {
+                        List<String> lines = Files.readAllLines(file);
+                        int linesOfCode = lines.size();
+                        totalLinesOfCode.addAndGet(linesOfCode);
+
+                        Path repositoryPath = repositoriesFolder.relativize(file.getParent());
+                        String repositoryName = repositoryPath.toString();
+                        linesOfCodePerRepository.merge(repositoryName, linesOfCode, Integer::sum);
+
+                        for (String keyword : keywords) {
+                            int count = 0;
+                            String regex = Pattern.quote(keyword.toLowerCase());
+                            Pattern pattern = Pattern.compile(regex);
+                            for (String line : lines) {
+                                Matcher matcher = pattern.matcher(line.toLowerCase());
+                                while (matcher.find()) {
+                                    count++;
+                                }
+                            }
+                            keywordCount.merge(keyword, count, Integer::sum);
+                        }
+
+                        System.out.println("Read file: " + file);
+                    } catch (IOException e) {
+                        System.err.println("Failed to read file: " + file);
                     }
                 });
 
@@ -367,7 +418,6 @@ public class GitHubService {
         for (int i = 0; i < LENGTH; i++) {
             sb.append(characters.charAt(random.nextInt(characters.length())));
         }
-
         return sb.toString();
     }
 }

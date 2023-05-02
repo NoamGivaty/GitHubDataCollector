@@ -2,22 +2,10 @@ package com.GitHubDataCollector.service;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -31,11 +19,13 @@ public class JsonToExcelConverter {
 
         // Define headers for CSV
         String[] headers = { "Name", "Username", "Url", "Public Repos", "Followers", "Following", "Java Repositories",
-                "Python Repositories", "Node.js Repositories", "Angular Repositories",
-                "React Repositories", ".NET Repositories", "Forks", "Commits", "Stars",
-                "Code Lines", "Tests", "Keywords" };
-        String[] columnsMapping = {"name", "username", "url", "publicRepos","followers","following","javaRepositories","pythonRepositories","nodeJsRepositories",
-                "angularRepositories","reactRepositories","netRepositories", "forks","commits","stars","codeLines","tests","keywords"};
+                "EJS Repositories", "C# Repositories", "JavaScript Repositories", "Jupyter Notebook Repositories",
+                "C++ Repositories", "CSS Repositories", "Python Repositories", "Node.js Repositories", "Angular Repositories",
+                "React Repositories","HTML Repositories", "Kotlin Repositories","C Repositories","TypeScript Repositories","Dart Repositories", "Objective-C Repositories", "Forks", "Commits", "Stars", "Code Lines", "Tests", "Keywords" };
+        String[] columnsMapping = {"name", "username", "url", "publicRepos","followers","following","javaRepositories","ejsRepositories",
+                "cSharpRepositories", "javaScriptRepositories", "jupyterRepositories", "cppRepositories","cssRepositories","pythonRepositories","nodeJsRepositories",
+                "angularRepositories","reactRepositories","htmlRepositories","kotlinRepositories","cRepositories","typeScriptRepositories","dartRepositories",
+                "objectiveCRepositories", "forks","commits","stars","codeLines","tests","keywords"};
 
         // Write data to CSV file
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -53,11 +43,22 @@ public class JsonToExcelConverter {
                 data.setFollowers(obj.getString("followers"));
                 data.setFollowing(obj.getString("following"));
                 data.setJavaRepositories(obj.getInt("java_repositories"));
+                data.setEjsRepositories(obj.getInt("ejs_repositories"));
+                data.setcSharpRepositories(obj.getInt("cSharp_repositories"));
+                data.setJavaScriptRepositories(obj.getInt("javaScript_repositories"));
+                data.setJupyterRepositories(obj.getInt("jupyter_repositories"));
+                data.setCppRepositories(obj.getInt("cpp_repositories"));
+                data.setCssRepositories(obj.getInt("css_repositories"));
                 data.setPythonRepositories(obj.getInt("python_repositories"));
                 data.setNodeJsRepositories(obj.getInt("node.js_repositories"));
                 data.setAngularRepositories(obj.getInt("angular_repositories"));
                 data.setReactRepositories(obj.getInt("react_repositories"));
-                data.setNetRepositories(obj.getInt(".net_repositories"));
+                data.setObjectiveCRepositories(obj.getInt("objectiveC_repositories"));
+                data.setDartRepositories(obj.getInt("dart_repositories"));
+                data.setTypeScriptRepositories(obj.getInt("typeScript_repositories"));
+                data.setCRepositories(obj.getInt("c_repositories"));
+                data.setKotlinRepositories(obj.getInt("kotlin_repositories"));
+                data.setHtmlRepositories(obj.getInt("html_repositories"));
                 data.setForks(obj.getInt("forks"));
                 data.setCommits(obj.getInt("commits"));
                 data.setStars(obj.getInt("stars"));

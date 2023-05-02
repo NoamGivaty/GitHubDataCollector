@@ -8,11 +8,23 @@ public class GithubData {
     private String followers;
     private String following;
     private int javaRepositories;
+    private int ejsRepositories;
+    private int cSharpRepositories;
+    private int javaScriptRepositories;
+    private int jupyterRepositories;
+    private int cppRepositories;
+    private int cssRepositories;
     private int pythonRepositories;
     private int nodeJsRepositories;
     private int angularRepositories;
     private int reactRepositories;
-    private int netRepositories;
+    private int objectiveCRepositories;
+    private int dartRepositories;
+    private int typeScriptRepositories;
+    private int CRepositories;
+    private int kotlinRepositories;
+    private int htmlRepositories;
+
     private int forks;
     private int commits;
     private int stars;
@@ -76,6 +88,54 @@ public class GithubData {
         this.javaRepositories = javaRepositories;
     }
 
+    public int getEjsRepositories() {
+        return ejsRepositories;
+    }
+
+    public void setEjsRepositories(int ejsRepositories) {
+        this.ejsRepositories = ejsRepositories;
+    }
+
+    public int getcSharpRepositories() {
+        return cSharpRepositories;
+    }
+
+    public void setcSharpRepositories(int cSharpRepositories) {
+        this.cSharpRepositories = cSharpRepositories;
+    }
+
+    public int getJavaScriptRepositories() {
+        return javaScriptRepositories;
+    }
+
+    public void setJavaScriptRepositories(int javaScriptRepositories) {
+        this.javaScriptRepositories = javaScriptRepositories;
+    }
+
+    public int getJupyterRepositories() {
+        return jupyterRepositories;
+    }
+
+    public void setJupyterRepositories(int jupyterRepositories) {
+        this.jupyterRepositories = jupyterRepositories;
+    }
+
+    public int getCppRepositories() {
+        return cppRepositories;
+    }
+
+    public void setCppRepositories(int cppRepositories) {
+        this.cppRepositories = cppRepositories;
+    }
+
+    public int getCssRepositories() {
+        return cssRepositories;
+    }
+
+    public void setCssRepositories(int cssRepositories) {
+        this.cssRepositories = cssRepositories;
+    }
+
     public int getPythonRepositories() {
         return pythonRepositories;
     }
@@ -108,12 +168,52 @@ public class GithubData {
         this.reactRepositories = reactRepositories;
     }
 
-    public int getNetRepositories() {
-        return netRepositories;
+    public int getObjectiveCRepositories() {
+        return objectiveCRepositories;
     }
 
-    public void setNetRepositories(int netRepositories) {
-        this.netRepositories = netRepositories;
+    public void setObjectiveCRepositories(int objectiveCRepositories) {
+        this.objectiveCRepositories = objectiveCRepositories;
+    }
+
+    public int getDartRepositories() {
+        return dartRepositories;
+    }
+
+    public void setDartRepositories(int dartRepositories) {
+        this.dartRepositories = dartRepositories;
+    }
+
+    public int getTypeScriptRepositories() {
+        return typeScriptRepositories;
+    }
+
+    public void setTypeScriptRepositories(int typeScriptRepositories) {
+        this.typeScriptRepositories = typeScriptRepositories;
+    }
+
+    public int getCRepositories() {
+        return CRepositories;
+    }
+
+    public void setCRepositories(int CRepositories) {
+        this.CRepositories = CRepositories;
+    }
+
+    public int getKotlinRepositories() {
+        return kotlinRepositories;
+    }
+
+    public void setKotlinRepositories(int kotlinRepositories) {
+        this.kotlinRepositories = kotlinRepositories;
+    }
+
+    public int getHtmlRepositories() {
+        return htmlRepositories;
+    }
+
+    public void setHtmlRepositories(int htmlRepositories) {
+        this.htmlRepositories = htmlRepositories;
     }
 
     public int getForks() {
