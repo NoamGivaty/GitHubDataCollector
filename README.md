@@ -1,8 +1,11 @@
 # GitHub Data Collector
 
 The GitHub Data Collector is a Java-based application that collects information on GitHub users and their repositories. The application performs scraping and regex operations to gather relevant repository URLs and raw data, then clones the repositories to collect additional data on specific languages, such as Java, Python, Node.js, Angular, React, and .NET. It also reads the repository files to obtain data on the number of lines and matches for specified keywords.
+## Running the Application - Online
 
-## Running the Application
+Go to https://githubscanner.com/ and have fun!
+
+## Running the Application - Local
 
 To run the application, set up the project with an IDE and run it. Access the application via http://localhost:8080/.
 
