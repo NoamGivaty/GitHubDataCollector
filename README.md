@@ -4,7 +4,11 @@ The GitHub Data Collector is a Java-based application that collects information 
 
 ## Running the Application
 
-To run the application, set up the project with an IDE and run it. Access the application via http://localhost:8080/swagger-ui.html. Enter one or more usernames separated by commas and without spaces, as well as any relevant keywords separated by commas.
+To run the application, set up the project with an IDE and run it. Access the application via http://localhost:8080/.
+
+## Docker Image
+
+To run the application using Docker, build the Dockerfile and run the image.
 
 ## Technologies Used
 
@@ -14,11 +18,6 @@ The GitHub Data Collector uses the following technologies:
 - Regex
 - Web Scraping
 - Docker
-
-
-## Docker Image
-
-To run the application using Docker, build the Dockerfile and run the image.
 
 ## Data Collected
 
