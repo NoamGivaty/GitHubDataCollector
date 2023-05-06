@@ -29,8 +29,9 @@
             flex-direction: column;
             justify-content: space-between;
             margin: 1rem auto 0;
-            width: 800px;
-            height: 480px;
+            width: 90%;
+            max-width: 800px;
+            height: auto;
             padding: 1rem;
         }
         label {
@@ -38,6 +39,7 @@
             font-size: 1.5rem;
             font-weight: bold;
             text-align: left;
+            padding: 1rem;
         }
         button[type="submit"] {
             background-color: #24292e;
@@ -49,6 +51,7 @@
             padding: 0.5rem 1rem;
             width: 100px;
             margin: 0 auto;
+            margin-top: 1rem;
         }
         #loading {
             display: none;
@@ -60,7 +63,8 @@
             font-size: 1.2rem;
             padding: 1rem;
             resize: vertical;
-            width: 700px;
+            max-width: 90%;
+            width: 100%;
             text-align: left;
         }
         textarea::placeholder {
@@ -72,6 +76,10 @@
             line-height: 1.5;
             text-align: left;
             white-space: pre-line; /* allows the placeholders to be displayed on multiple lines */
+        }
+        /* Set the viewport width to the device width */
+        @viewport {
+            width: device-width;
         }
     </style>
 </head>

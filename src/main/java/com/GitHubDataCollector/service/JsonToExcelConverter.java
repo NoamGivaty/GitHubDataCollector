@@ -18,14 +18,22 @@ public class JsonToExcelConverter {
         JSONArray jsonArray = new JSONArray(jsonData);
 
         // Define headers for CSV
-        String[] headers = { "Name", "Username", "Url", "Public Repos", "Followers", "Following", "Java Repositories",
-                "EJS Repositories", "C# Repositories", "JavaScript Repositories", "Jupyter Notebook Repositories",
+        String[] headers = { "Name", "Username", "Url", "Followers", "Following", "Forks", "Commits", "Stars", "Code Lines", "Tests", "Keywords",
+                "Public Repos", "Forked Repositories", "Empty Repositories",
+                "Java Repositories", "EJS Repositories", "C# Repositories", "JavaScript Repositories", "Jupyter Notebook Repositories",
                 "C++ Repositories", "CSS Repositories", "Python Repositories", "Node.js Repositories", "Angular Repositories",
-                "React Repositories","HTML Repositories", "Kotlin Repositories","C Repositories","TypeScript Repositories","Dart Repositories", "Objective-C Repositories", "Forks", "Commits", "Stars", "Code Lines", "Tests", "Keywords" };
-        String[] columnsMapping = {"name", "username", "url", "publicRepos","followers","following","javaRepositories","ejsRepositories",
-                "cSharpRepositories", "javaScriptRepositories", "jupyterRepositories", "cppRepositories","cssRepositories","pythonRepositories","nodeJsRepositories",
-                "angularRepositories","reactRepositories","htmlRepositories","kotlinRepositories","cRepositories","typeScriptRepositories","dartRepositories",
-                "objectiveCRepositories", "forks","commits","stars","codeLines","tests","keywords"};
+                "React Repositories","HTML Repositories", "Kotlin Repositories","C Repositories","TypeScript Repositories",
+                "Dart Repositories", "Objective-C Repositories", "Swift Repositories", "Go Repositories", "Rust Repositories",
+                "Ruby Repositories", "Scala Repositories", "PHP Repositories", "R Repositories", "SCSS Repositories",
+                "Assembly Repositories", "Pawn Repositories",
+                 };
+        String[] columnsMapping = {"name", "username", "url", "followers","following", "forks", "commits", "stars", "codeLines", "tests", "keywords",
+                "publicRepos", "forkedRepos", "emptyRepos",
+                "javaRepositories","ejsRepositories", "cSharpRepositories", "javaScriptRepositories", "jupyterRepositories", "cppRepositories",
+                "cssRepositories","pythonRepositories","nodeJsRepositories", "angularRepositories","reactRepositories","htmlRepositories","kotlinRepositories",
+                "cRepositories","typeScriptRepositories","dartRepositories", "objectiveCRepositories","swiftRepositories", "goRepositories", "rustRepositories",
+                "rubyRepositories", "scalaRepositories", "phpRepositories", "rRepositories", "scssRepositories", "assemblyRepositories", "pawnRepositories",
+                };
 
         // Write data to CSV file
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -40,10 +48,15 @@ public class JsonToExcelConverter {
                 data.setUsername(obj.getString("username"));
                 data.setUrl(obj.getString("url"));
                 data.setPublicRepos(obj.getString("public_repos"));
+                data.setForkedRepos(obj.getInt("forked_repos"));
+                data.setEmptyRepos(obj.getInt("empty_repos"));
                 data.setFollowers(obj.getString("followers"));
                 data.setFollowing(obj.getString("following"));
                 data.setJavaRepositories(obj.getInt("java_repositories"));
                 data.setEjsRepositories(obj.getInt("ejs_repositories"));
+                data.setScssRepositories(obj.getInt("scss_repositories"));
+                data.setAssemblyRepositories(obj.getInt("assembly_repositories"));
+                data.setPawnRepositories(obj.getInt("pawn_repositories"));
                 data.setcSharpRepositories(obj.getInt("cSharp_repositories"));
                 data.setJavaScriptRepositories(obj.getInt("javaScript_repositories"));
                 data.setJupyterRepositories(obj.getInt("jupyter_repositories"));
@@ -59,12 +72,20 @@ public class JsonToExcelConverter {
                 data.setCRepositories(obj.getInt("c_repositories"));
                 data.setKotlinRepositories(obj.getInt("kotlin_repositories"));
                 data.setHtmlRepositories(obj.getInt("html_repositories"));
+                data.setSwiftRepositories(obj.getInt("swift_repositories"));
+                data.setGoRepositories(obj.getInt("go_repositories"));
+                data.setRustRepositories(obj.getInt("rust_repositories"));
+                data.setRubyRepositories(obj.getInt("ruby_repositories"));
+                data.setScalaRepositories(obj.getInt("scala_repositories"));
+                data.setPhpRepositories(obj.getInt("php_repositories"));
+                data.setrRepositories(obj.getInt("r_repositories"));
                 data.setForks(obj.getInt("forks"));
                 data.setCommits(obj.getInt("commits"));
                 data.setStars(obj.getInt("stars"));
                 data.setCodeLines(obj.getString("code_lines"));
                 data.setTests(obj.getInt("tests"));
                 data.setKeywords(obj.getString("keywords"));
+
                 csvWriter.write(data, columnsMapping);
             }
         }
