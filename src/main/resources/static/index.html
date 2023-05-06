@@ -34,6 +34,17 @@
             height: auto;
             padding: 1rem;
         }
+        .container {
+            width: 90%;
+            overflow-x: auto;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 1rem;
+        }
+        table{
+            max-width: 90%;
+            width: 100%;
+        }
         label {
             display: block;
             font-size: 1.5rem;
@@ -41,7 +52,7 @@
             text-align: left;
             padding: 1rem;
         }
-        button[type="submit"] {
+        button {
             background-color: #24292e;
             border: none;
             border-radius: 4px;
@@ -98,8 +109,26 @@ https://github.com/NoamGivaty" rows="5" wrap="soft" style="white-space: pre-wrap
 kafka
 redis" rows="5" wrap="soft" style="white-space: pre-wrap;"></textarea>
 
-    <button type="submit">Scan</button>
+    <div style="display: flex; gap: 1rem; margin-top: 1rem; width: 100%;">
+        <button type="submit" style="width: 30%;">Scan</button>
+        <button type="button" id="downloadButton" onclick="downloadCSV(csvString)" style="width: 30%; display: none;">Download</button>
+    </div>
+
+
 </form>
+<div class="container">
+    <table id="csvTable">
+        <thead>
+        <tr>
+            <!-- Table headers will be dynamically generated from the CSV data -->
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Table rows will be dynamically generated from the CSV data -->
+        </tbody>
+    </table>
+</div>
+
 <div id="loading">
     <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="loading clock" width="100px">
 </div>
@@ -110,6 +139,12 @@ redis" rows="5" wrap="soft" style="white-space: pre-wrap;"></textarea>
   const keywords = document.getElementById("keywords").value;
   const xhr = new XMLHttpRequest();
   document.getElementById("loading").style.display = "block";
+
+  const table = document.getElementById('csvTable');
+  table.style.display = 'none'; // Hide the table
+  const downloadButton = document.getElementById('downloadButton');
+  downloadButton.style.display = 'none'; // Hide the Download button
+
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4) {
       if (xhr.status === 200) {
@@ -120,7 +155,7 @@ redis" rows="5" wrap="soft" style="white-space: pre-wrap;"></textarea>
             if (xhr2.readyState === 4 && xhr2.status === 200) {
               clearInterval(intervalId); // Stop polling
               document.getElementById("loading").style.display = "none";
-              downloadCSV(xhr2.responseText);
+              showCSV(xhr2.responseText);
             }
           };
           xhr2.open("GET", `/collectGitHubDataResult?token=${xhr.responseText}`, true);
@@ -154,6 +189,51 @@ function downloadCSV(csvString) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+function showCSV(csvString) {
+    const rows = csvString.trim().split('\n');
+    const table = document.getElementById('csvTable');
+
+    // Clear existing table content
+    while (table.tBodies[0].firstChild) {
+        table.tBodies[0].removeChild(table.tBodies[0].firstChild);
+    }
+
+    // Generate table headers only if there is no existing header row
+    if (!table.tHead.rows.length) {
+        const headers = rows.shift().split(',');
+        const headerRow = document.createElement('tr');
+        headers.forEach((header) => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        table.tHead.appendChild(headerRow);
+    }
+
+    // Generate table rows
+    rows.forEach((rowString) => {
+        const row = document.createElement('tr');
+        const rowData = rowString.split(',');
+        rowData.forEach((cellData) => {
+            const cell = document.createElement('td');
+            cell.textContent = cellData;
+            row.appendChild(cell);
+        });
+        table.tBodies[0].appendChild(row);
+    });
+
+    // Show the table
+    table.style.display = 'table';
+
+    // Show the Download button
+    const downloadButton = document.getElementById('downloadButton');
+    downloadButton.style.display = 'block';
+
+    downloadButton.onclick = function() {
+        downloadCSV(csvString);
+    };
 }
 
 </script>

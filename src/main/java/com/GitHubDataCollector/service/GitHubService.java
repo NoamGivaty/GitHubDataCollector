@@ -471,24 +471,6 @@ public class GitHubService {
         return repositoryUrls;
     }
     //----html/regex-requests------------
-//    public static String getRegexGroup(Pattern pattern, String html){
-//        Matcher matcher = pattern.matcher(html);
-//        matcher.find();
-//
-//        try {
-//            String ret = matcher.group(1);
-//            if(ret.endsWith("k"))
-//                ret = convertToNumber(ret);
-//            if (ret.contains(",")) {
-//                ret = ret.replace(",", "");
-//            }
-//            return ret;
-//        } catch (Exception e) {
-//            if(!pattern.equals(FORKED_FROM_PATTERN) && !pattern.equals(EMPTY_PATTERN) && !pattern.equals(USER_NOT_FOUND_PATTERN))
-//                System.err.println(pattern);
-//            return "0";
-//        }
-//    }
     public static String getRegexGroup(Pattern pattern, String html, String source, String username){
         Matcher matcher = pattern.matcher(html);
         matcher.find();
