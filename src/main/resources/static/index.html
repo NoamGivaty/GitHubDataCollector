@@ -37,13 +37,24 @@
         .container {
             width: 90%;
             overflow-x: auto;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             margin-bottom: 1rem;
         }
-        table{
+        table {
             max-width: 90%;
             width: 100%;
+            margin: 0 auto;
+            margin-bottom: 1rem;
+            border-collapse: collapse;
+        }
+        table th,
+        table td {
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+        }
+        .container .visible {
+          display: table;
         }
         label {
             display: block;
@@ -223,6 +234,9 @@ function showCSV(csvString) {
         });
         table.tBodies[0].appendChild(row);
     });
+
+    // Add a class to the table
+    table.classList.add('visible');
 
     // Show the table
     table.style.display = 'table';
