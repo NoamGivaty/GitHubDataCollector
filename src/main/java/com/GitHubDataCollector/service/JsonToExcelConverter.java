@@ -3,10 +3,11 @@ package com.GitHubDataCollector.service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import com.GitHubDataCollector.model.GithubData;
+import com.GitHubDataCollector.model.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
@@ -14,6 +15,9 @@ import org.supercsv.prefs.CsvPreference;
 
 @Service
 public class JsonToExcelConverter {
+
+    @Autowired
+    UserService userService;
 
     public String writeJsonToCsv(String jsonData) throws IOException, JSONException {
         // Parse JSON data
@@ -45,49 +49,8 @@ public class JsonToExcelConverter {
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                GithubData data = new GithubData();
-                data.setName(obj.getString("name"));
-                data.setUsername(obj.getString("username"));
-                data.setUrl(obj.getString("url"));
-                data.setPublicRepos(obj.getInt("public_repos"));
-                data.setForkedRepos(obj.getInt("forked_repos"));
-                data.setEmptyRepos(obj.getInt("empty_repos"));
-                data.setFollowers(obj.getInt("followers"));
-                data.setFollowing(obj.getInt("following"));
-                data.setJavaRepositories(obj.getInt("java_repositories"));
-                data.setEjsRepositories(obj.getInt("ejs_repositories"));
-                data.setScssRepositories(obj.getInt("scss_repositories"));
-                data.setAssemblyRepositories(obj.getInt("assembly_repositories"));
-                data.setPawnRepositories(obj.getInt("pawn_repositories"));
-                data.setcSharpRepositories(obj.getInt("cSharp_repositories"));
-                data.setJavaScriptRepositories(obj.getInt("javaScript_repositories"));
-                data.setJupyterRepositories(obj.getInt("jupyter_repositories"));
-                data.setCppRepositories(obj.getInt("cpp_repositories"));
-                data.setCssRepositories(obj.getInt("css_repositories"));
-                data.setPythonRepositories(obj.getInt("python_repositories"));
-                data.setNodeJsRepositories(obj.getInt("node.js_repositories"));
-                data.setAngularRepositories(obj.getInt("angular_repositories"));
-                data.setReactRepositories(obj.getInt("react_repositories"));
-                data.setObjectiveCRepositories(obj.getInt("objectiveC_repositories"));
-                data.setDartRepositories(obj.getInt("dart_repositories"));
-                data.setTypeScriptRepositories(obj.getInt("typeScript_repositories"));
-                data.setCRepositories(obj.getInt("c_repositories"));
-                data.setKotlinRepositories(obj.getInt("kotlin_repositories"));
-                data.setHtmlRepositories(obj.getInt("html_repositories"));
-                data.setSwiftRepositories(obj.getInt("swift_repositories"));
-                data.setGoRepositories(obj.getInt("go_repositories"));
-                data.setRustRepositories(obj.getInt("rust_repositories"));
-                data.setRubyRepositories(obj.getInt("ruby_repositories"));
-                data.setScalaRepositories(obj.getInt("scala_repositories"));
-                data.setPhpRepositories(obj.getInt("php_repositories"));
-                data.setrRepositories(obj.getInt("r_repositories"));
-                data.setForks(obj.getInt("forks"));
-                data.setCommits(obj.getInt("commits"));
-                data.setStars(obj.getInt("stars"));
-                data.setCodeLines(obj.getInt("code_lines"));
-                data.setTests(obj.getInt("tests"));
-                data.setKeywords(obj.getString("keywords"));
-
+                User data = new User().JSONObjectToUser(obj);
+                userService.save(data);
                 csvWriter.write(data, columnsMapping);
             }
         }

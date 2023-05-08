@@ -22,6 +22,11 @@ public class UserService {
     }
 
     public User save(User user) {
+        Optional<User> optionalUser = repository.findByUsername(user.getUsername());
+        if (optionalUser.isPresent()) {
+            user.updateUser(optionalUser.get());
+            return repository.save(optionalUser.get());
+        }
         return repository.save(user);
     }
 

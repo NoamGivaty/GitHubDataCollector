@@ -1,7 +1,6 @@
 package com.GitHubDataCollector.controller;
 
 import com.GitHubDataCollector.model.User;
-import com.GitHubDataCollector.model.UserIn;
 import com.GitHubDataCollector.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,14 +25,13 @@ public class UserController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> insertUser(@RequestBody UserIn userIn) {
-        User user = userIn.toUser();
-        user = userService.save(user);
+    public ResponseEntity<?> insertUser(@RequestBody User user) {
+        userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserIn user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
         Optional<User> dbUser = userService.findById(id);
         if (dbUser.isEmpty()) throw new RuntimeException("User with id: " + id + " not found");
         user.updateUser(dbUser.get());
