@@ -1,14 +1,14 @@
-package com.GitHubDataCollector.service;
+package com.GitHubDataCollector.model;
 
 public class GithubData {
     private String name;
     private String username;
     private String url;
-    private String publicRepos;
+    private int publicRepos;
     private int forkedRepos;
     private int emptyRepos;
-    private String followers;
-    private String following;
+    private int followers;
+    private int following;
     private int scssRepositories;
     private int assemblyRepositories;
     private int pawnRepositories;
@@ -39,7 +39,7 @@ public class GithubData {
     private int forks;
     private int commits;
     private int stars;
-    private String codeLines;
+    private int codeLines;
     private int tests;
     private String keywords;
 
@@ -63,15 +63,15 @@ public class GithubData {
         this.url = url;
     }
 
-    public void setPublicRepos(String publicRepos) {
+    public void setPublicRepos(int publicRepos) {
         this.publicRepos = publicRepos;
     }
 
-    public void setFollowers(String followers) {
+    public void setFollowers(int followers) {
         this.followers = followers;
     }
 
-    public void setFollowing(String following) {
+    public void setFollowing(int following) {
         this.following = following;
     }
 
@@ -203,7 +203,7 @@ public class GithubData {
         this.stars = stars;
     }
 
-    public void setCodeLines(String codeLines) {
+    public void setCodeLines(int codeLines) {
         this.codeLines = codeLines;
     }
 
@@ -227,16 +227,16 @@ public class GithubData {
         return url;
     }
 
-    public String getPublicRepos() {
+    public int getPublicRepos() {
         return publicRepos;
     }
 
 
-    public String getFollowers() {
+    public int getFollowers() {
         return followers;
     }
 
-    public String getFollowing() {
+    public int getFollowing() {
         return following;
     }
 
@@ -362,7 +362,7 @@ public class GithubData {
         return stars;
     }
 
-    public String getCodeLines() {
+    public int getCodeLines() {
         return codeLines;
     }
 

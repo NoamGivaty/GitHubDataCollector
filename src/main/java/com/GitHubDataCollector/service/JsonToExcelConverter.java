@@ -2,6 +2,8 @@ package com.GitHubDataCollector.service;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+
+import com.GitHubDataCollector.model.GithubData;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,11 +49,11 @@ public class JsonToExcelConverter {
                 data.setName(obj.getString("name"));
                 data.setUsername(obj.getString("username"));
                 data.setUrl(obj.getString("url"));
-                data.setPublicRepos(obj.getString("public_repos"));
+                data.setPublicRepos(obj.getInt("public_repos"));
                 data.setForkedRepos(obj.getInt("forked_repos"));
                 data.setEmptyRepos(obj.getInt("empty_repos"));
-                data.setFollowers(obj.getString("followers"));
-                data.setFollowing(obj.getString("following"));
+                data.setFollowers(obj.getInt("followers"));
+                data.setFollowing(obj.getInt("following"));
                 data.setJavaRepositories(obj.getInt("java_repositories"));
                 data.setEjsRepositories(obj.getInt("ejs_repositories"));
                 data.setScssRepositories(obj.getInt("scss_repositories"));
@@ -82,7 +84,7 @@ public class JsonToExcelConverter {
                 data.setForks(obj.getInt("forks"));
                 data.setCommits(obj.getInt("commits"));
                 data.setStars(obj.getInt("stars"));
-                data.setCodeLines(obj.getString("code_lines"));
+                data.setCodeLines(obj.getInt("code_lines"));
                 data.setTests(obj.getInt("tests"));
                 data.setKeywords(obj.getString("keywords"));
 
