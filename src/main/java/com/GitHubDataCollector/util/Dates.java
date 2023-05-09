@@ -77,4 +77,11 @@ public class Dates {
             return Objects.equals(date1, date2);
         }
     }
+
+    public static int getDaysDifference(Date date1, Date date2) {
+        DateTime dateTime1 = new DateTime(date1);
+        DateTime dateTime2 = new DateTime(date2);
+        return Days.daysBetween(dateTime1, dateTime2).getDays();
+    }
+
 }

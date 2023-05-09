@@ -1,7 +1,7 @@
 package com.GitHubDataCollector.controller;
 
 import com.GitHubDataCollector.service.GitHubService;
-import com.GitHubDataCollector.service.JsonToExcelConverter;
+import com.GitHubDataCollector.service.JsonToCsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class MainController {
     GitHubService gitHubService;
 
     @Autowired
-    JsonToExcelConverter jsonToExcelConverter;
+    JsonToCsvService jsonToCsvService;
 
     Map<String, String> tokenToResult = new HashMap<>();
 
@@ -39,7 +39,7 @@ public class MainController {
 
                 String jsonString = gitHubService.getMultiplyUsersInfo(usernames, keywords);
 
-                String csvString = jsonToExcelConverter.writeJsonToCsv(jsonString);
+                String csvString = jsonToCsvService.writeJsonToCsv(jsonString);
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=githubdata.csv");
                 headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");

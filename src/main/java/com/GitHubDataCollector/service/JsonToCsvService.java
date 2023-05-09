@@ -14,7 +14,7 @@ import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;
 
 @Service
-public class JsonToExcelConverter {
+public class JsonToCsvService {
 
     @Autowired
     UserService userService;
@@ -50,7 +50,7 @@ public class JsonToExcelConverter {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 User data = new User().JSONObjectToUser(obj);
-                //userService.save(data);
+                userService.save(data);
                 csvWriter.write(data, columnsMapping);
             }
         }

@@ -364,7 +364,8 @@ public class GitHubService {
         List<String> importantKeywords = importantKeywords();
         List<String> keywords = new ArrayList<>();
         keywords.addAll(importantKeywords);
-        keywords.addAll(keys);
+        if(keys!=null)
+            keywords.addAll(keys);
 
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode objectNode = factory.objectNode();
