@@ -428,8 +428,13 @@ public class GitHubService {
         objectNode.put("tests",count);
         if(words.toString().contains("{="))
             objectNode.put("keywords","-");
-        else
-            objectNode.put("keywords",words.toString());
+        else{
+            String wordsString = words.toString();
+            wordsString = wordsString.replace("{","");
+            wordsString = wordsString.replace("}","");
+            wordsString = wordsString.replace(","," ");
+            objectNode.put("keywords",wordsString);
+        }
 
         return objectNode;
     }
