@@ -9,9 +9,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SpringBootApplication
 public class GitHubDataCollectorApplication {
+	ExecutorService executorService = Executors.newFixedThreadPool(1);
 
 	@Autowired
 	AutoUpdateService autoUpdateService;
@@ -20,8 +23,14 @@ public class GitHubDataCollectorApplication {
 		SpringApplication.run(GitHubDataCollectorApplication.class, args);
 	}
 
-	@PostConstruct
-	public void init() throws IOException, InterruptedException {
-		autoUpdateService.startAutoUpdate();
-	}
+//	@PostConstruct
+//	public void init() throws IOException, InterruptedException {
+//		executorService.execute(() -> {
+//			try {
+//				autoUpdateService.startAutoUpdate();
+//			} catch (IOException | InterruptedException e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
+//	}
 }

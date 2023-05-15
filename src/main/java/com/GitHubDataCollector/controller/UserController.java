@@ -25,13 +25,13 @@ public class UserController {
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<?> insertUser(@RequestBody User user) {
+    public ResponseEntity<?> insertUser(@RequestBody User user) throws InterruptedException {
         userService.save(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User user) throws InterruptedException {
         Optional<User> dbUser = userService.findById(id);
         if (dbUser.isEmpty()) throw new RuntimeException("User with id: " + id + " not found");
         user.updateUser(dbUser.get());

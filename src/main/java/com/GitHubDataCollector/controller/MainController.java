@@ -4,6 +4,7 @@ import com.GitHubDataCollector.service.GitHubService;
 import com.GitHubDataCollector.service.JsonToCsvService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -38,13 +39,11 @@ public class MainController {
                 printUsernamesAndKeywords(usernames,keywords);
 
                 String jsonString = gitHubService.getMultiplyUsersInfo(usernames, keywords);
-
                 String csvString = jsonToCsvService.writeJsonToCsv(jsonString);
                 HttpHeaders headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=githubdata.csv");
                 headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
                 headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, HttpHeaders.CONTENT_DISPOSITION);
-                System.out.println(csvString);
                 tokenToResult.put(token, csvString);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);

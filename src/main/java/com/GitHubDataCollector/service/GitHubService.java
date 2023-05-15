@@ -1,13 +1,11 @@
 package com.GitHubDataCollector.service;
 
 import org.apache.commons.io.FileUtils;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
-
 import java.io.*;
 import java.nio.file.*;
 import java.time.Duration;
@@ -35,7 +33,7 @@ public class GitHubService {
     public static final Pattern FORKED_FROM_PATTERN = Pattern.compile("forked[ ]from([^h]+)");
     public static final Pattern EMPTY_PATTERN = Pattern.compile("This repository is ([^.]+)");
     public static final Pattern USER_NOT_FOUND_PATTERN = Pattern.compile("Not ([^ ]+)");
-    public static final int NUMBER_OF_THREADS = 10;
+    public static final int NUMBER_OF_THREADS = 20;
 
     private static OkHttpClient client = new OkHttpClient.Builder()
             .callTimeout(Duration.ofSeconds(60))
@@ -53,19 +51,13 @@ public class GitHubService {
         AtomicInteger count = new AtomicInteger();
         for (String user : users) {
             executorService.execute(() -> {
-                for (int i = 1; i <= 2; i++) { // retry up to 2 times
-                    try {
-                        JSONObject jsonObject = new JSONObject(getUserInfo(user, keywords));
-                        jsonArray.put(jsonObject);
-                        count.getAndIncrement();
-                        System.out.println(user + " | Succeed getting user info | " + count.get() + "/" + users.size() + " Users");
-                        return; // break out of loop if successful
-                    } catch (IOException | InterruptedException e) {
-                        if (i == 2) { // last attempt failed
-                            System.err.println(user + " | Failed to get user info after 2 attempts");
-                            //e.printStackTrace(); // log exception
-                        }
-                    }
+                try {
+                    JSONObject jsonObject = new JSONObject(getUserInfo(user, keywords));
+                    jsonArray.put(jsonObject);
+                    count.getAndIncrement();
+                    System.out.println(user + " | Succeed getting user info | " + count.get() + "/" + users.size() + " Users");
+                } catch (IOException | InterruptedException e) {
+                    System.err.println(user + " | Failed to get user info");
                 }
             });
         }
@@ -79,6 +71,7 @@ public class GitHubService {
         return jsonArray.toString();
     }
     public String getUserInfo(String username, List<String> keywords) throws IOException, InterruptedException {
+
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode objectNode = factory.objectNode();
 
@@ -92,7 +85,7 @@ public class GitHubService {
     } //main method
 
     //----data-collectors------------
-    public static ObjectNode rawData (String username) throws IOException {
+    public static ObjectNode rawData (String username) throws IOException, InterruptedException {
         JsonNodeFactory factory = JsonNodeFactory.instance;
         ObjectNode objectNode = factory.objectNode();
         String html = getRepositoriesPageHtml(username,1);
@@ -133,15 +126,17 @@ public class GitHubService {
 
         for(String URL : allRepositories){
             Thread thread = new Thread(() -> {
-
+                boolean isEmpty;
+                boolean isForked;
                 String html;
                 try {
                     html = getPageHtml(URL);
-                } catch (IOException e) {
+                    isEmpty = !getRegexGroup(EMPTY_PATTERN, html, "Empty", username).equals("0");
+                    isForked = !getRegexGroup(FORKED_FROM_PATTERN, html, "Forked", username).equals("0");
+                } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                boolean isEmpty = !getRegexGroup(EMPTY_PATTERN, html, "Empty", username).equals("0");
-                boolean isForked = !getRegexGroup(FORKED_FROM_PATTERN, html, "Forked", username).equals("0");
+
 
                 if (isEmpty)
                     emptyRepositories.incrementAndGet();
@@ -149,9 +144,13 @@ public class GitHubService {
                     forkedRepositories.incrementAndGet();
                 else{
                     validRepositories.add(URL);
-                    forks.addAndGet(Integer.parseInt(getRegexGroup(FORKS_PATTERN1,html,URL,username)));
-                    commits.addAndGet(Integer.parseInt(getRegexGroup(COMMITS_PATTERN, html,URL,username)));
-                    stars.addAndGet(Integer.parseInt(getRegexGroup(STARS_PATTERN1, html,URL,username)));
+                    try {
+                        forks.addAndGet(Integer.parseInt(getRegexGroup(FORKS_PATTERN1,html,URL,username)));
+                        commits.addAndGet(Integer.parseInt(getRegexGroup(COMMITS_PATTERN, html,URL,username)));
+                        stars.addAndGet(Integer.parseInt(getRegexGroup(STARS_PATTERN1, html,URL,username)));
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
             threads.add(thread);
@@ -330,12 +329,13 @@ public class GitHubService {
 
         AtomicInteger succeed = new AtomicInteger();
         AtomicInteger failed = new AtomicInteger();
-        System.out.println(username + " | Start cloning repositories");
+        System.out.println(username + " | Start clone repositories");
         for (String repositoryUrl : repositoryUrls) {
             executorService.execute(new Thread(() -> {
                 String[] command = {"git", "clone", repositoryUrl};
                 ProcessBuilder processBuilder = new ProcessBuilder(command);
                 processBuilder.directory(repositoriesFolder);
+                ////////######FIX
                 boolean isCloned = false;
                 for(int i = 0 ; i < 3 && !isCloned ; i++) {
                     try {
@@ -477,30 +477,31 @@ public class GitHubService {
         return repositoryUrls;
     }
     //----html/regex-requests------------
-    public static String getRegexGroup(Pattern pattern, String html, String source, String username){
+    public static String getRegexGroup(Pattern pattern, String html, String source, String username) throws InterruptedException {
+        Random random = new Random();
         Matcher matcher = pattern.matcher(html);
         matcher.find();
 
         try {
             String ret = matcher.group(1);
-            if(ret.endsWith("k"))
+            if (ret.endsWith("k"))
                 ret = convertToNumber(ret);
             if (ret.contains(",")) {
                 ret = ret.replace(",", "");
             }
             return ret;
         } catch (Exception e) {
-            if(pattern.equals(FORKS_PATTERN1)){
-                return getRegexGroup(FORKS_PATTERN2,html, source, username);
-            }
-            if(pattern.equals(STARS_PATTERN1)){
-                return getRegexGroup(STARS_PATTERN2,html, source, username);
-            }
-            if(!pattern.equals(FORKED_FROM_PATTERN) && !pattern.equals(EMPTY_PATTERN) && !pattern.equals(USER_NOT_FOUND_PATTERN))
-                System.err.println("Error | User: " + username + " | Source: " + source + " | Regex: " + pattern);
 
-            return "0";
+            if (pattern.equals(FORKS_PATTERN1)) {
+                return getRegexGroup(FORKS_PATTERN2, html, source, username);
+            }
+            if (pattern.equals(STARS_PATTERN1)) {
+                return getRegexGroup(STARS_PATTERN2, html, source, username);
+            }
+            if (!pattern.equals(FORKED_FROM_PATTERN) && !pattern.equals(EMPTY_PATTERN) && !pattern.equals(USER_NOT_FOUND_PATTERN))
+                System.err.println("Error | User: " + username + " | Source: " + source + " | Regex: " + pattern);
         }
+        return "0";
     }
     public static String convertToNumber(String str) {
         double num = Double.parseDouble(str.substring(0, str.length() - 1));
