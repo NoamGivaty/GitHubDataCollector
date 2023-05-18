@@ -21,6 +21,7 @@ The GitHub Data Collector uses the following technologies:
 - Regex
 - Web Scraping
 - Docker
+- PostgreSQL
 
 ## Data Collected
 
